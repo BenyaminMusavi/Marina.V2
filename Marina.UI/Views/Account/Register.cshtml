@@ -30,7 +30,10 @@
 
                 <div class="form-outline mb-4">
                     <label for="region" class="form-label">Region</label>
-                    @Html.DropDownListFor(model => model.RegionId,ViewBag.RegionList as SelectList ,"select a region", new {style="height:40px;" , @class = "form-control", id="regionId" })
+                    @*                    @Html.DropDownListFor(model => model.RegionId,ViewBag.RegionList as SelectList ,"select a region", new {style="height:40px;" , @class = "form-control", id="regionId" })
+                *@                    @Html.DropDownListFor(model => model.RegionId, await Marina.UI.General.Helper.GetDropDown("Region") ,"select a region", new {style="height:40px;" , @class = "form-control", id="regionId" })
+                    @*                    @Html.DropDownList("Cntry_Code", await Marina.UI.General.Helper.GetRegionDropDown(), new { @class = "form-control", id = "Country" })
+                *@
                     <div class="invalid-feedback">
                         Please enter a valid region.
                     </div>
@@ -38,7 +41,8 @@
 
                 <div class="form-outline mb-4">
                     <label for="rsm" class="form-label">RSM</label>
-                    @Html.DropDownListFor(model => model.RSMId,ViewBag.RSMList as SelectList ,"select a rsm", new {style="height:40px;" ,@class = "form-control", id="rsmId" })
+                    @*@Html.DropDownListFor(model => model.RSMId,ViewBag.RSMList as SelectList ,"select a rsm", new {style="height:40px;" ,@class = "form-control", id="rsmId" })*@
+                    @Html.DropDownListFor(model => model.RSMId,await Marina.UI.General.Helper.GetDropDown("RSM") ,"select a rsm", new {style="height:40px;" ,@class = "form-control", id="rsmId" })
                     <div class="invalid-feedback">
                         Please enter a valid rsm.
                     </div>
@@ -46,7 +50,8 @@
 
                 <div class="form-outline mb-4">
                     <label for="nsm" class="form-label">NSM</label>
-                    @Html.DropDownListFor(model => model.NsmId,ViewBag.NsmList as SelectList ,"select a nsm", new {style="height:40px;" ,@class = "form-control", id="nsmId" })
+                    @*@Html.DropDownListFor(model => model.NsmId,ViewBag.NsmList as SelectList ,"select a nsm", new {style="height:40px;" ,@class = "form-control", id="nsmId" })*@
+                    @Html.DropDownListFor(model => model.NsmId,await Marina.UI.General.Helper.GetDropDown("NSM") ,"select a nsm", new {style="height:40px;" ,@class = "form-control", id="nsmId" })
                     <div class="invalid-feedback">
                         Please enter a valid nsm.
                     </div>
@@ -62,7 +67,8 @@
 
                 <div class="form-outline mb-4">
                     <label for="distributorId" class="form-label">Distributor Code</label>
-                    @Html.DropDownListFor(model => model.DistributorId,ViewBag.DistributorList as SelectList ,"select a distributor code", new {style="height:40px;", @class = "form-control", id="distributorId" })
+                    @*@Html.DropDownListFor(model => model.DistributorId,ViewBag.DistributorList as SelectList ,"select a distributor code", new {style="height:40px;", @class = "form-control", id="distributorId" })*@
+                    @Html.DropDownListFor(model => model.DistributorId,await Marina.UI.General.Helper.GetDropDown("Distributor") ,"select a distributor code", new {style="height:40px;", @class = "form-control", id="distributorId" })
                     <div class="invalid-feedback">
                         Please enter a valid distributorId.
                     </div>
@@ -70,7 +76,8 @@
 
                 <div class="form-outline mb-4">
                     <label for="line" class="form-label">Line</label>
-                    @Html.DropDownListFor(model => model.LineId,ViewBag.LineList as SelectList ,"select a line", new {style="height:40px;", @class = "form-control", id="lineId" })
+                    @*@Html.DropDownListFor(model => model.LineId,ViewBag.LineList as SelectList ,"select a line", new {style="height:40px;", @class = "form-control", id="lineId" })*@
+                    @Html.DropDownListFor(model => model.LineId,await Marina.UI.General.Helper.GetDropDown("Line") ,"select a line", new {style="height:40px;", @class = "form-control", id="lineId" })
                     <div class="invalid-feedback">
                         Please enter a valid line.
                     </div>
@@ -78,7 +85,8 @@
 
                 <div class="form-outline mb-4">
                     <label for="province" class="form-label">Province</label>
-                    @Html.DropDownListFor(model => model.ProvinceId,ViewBag.ProvinceList as SelectList ,"select a province", new {style="height:40px;", @class = "form-control", id="provinceId" })
+                    @*@Html.DropDownListFor(model => model.ProvinceId,ViewBag.ProvinceList as SelectList ,"select a province", new {style="height:40px;", @class = "form-control", id="provinceId" })*@
+                    @Html.DropDownListFor(model => model.ProvinceId,await Marina.UI.General.Helper.GetDropDown("Province") ,"select a province", new {style="height:40px;", @class = "form-control", id="provinceId" })
                     <div class="invalid-feedback">
                         Please enter a valid province.
                     </div>
@@ -86,7 +94,8 @@
 
                 <div class="form-outline mb-4">
                     <label for="supervisor" class="form-label">Supervisor</label>
-                    @Html.DropDownListFor(model => model.SupervisorId,ViewBag.SupervisorList as SelectList ,"select a supervisor", new {style="height:40px;", @class = "form-control", id="supervisorId" })
+                    @*@Html.DropDownListFor(model => model.SupervisorId,ViewBag.SupervisorList as SelectList ,"select a supervisor", new {style="height:40px;", @class = "form-control", id="supervisorId" })*@
+                    @Html.DropDownListFor(model => model.SupervisorId,await Marina.UI.General.Helper.GetDropDown("Supervisor") ,"select a supervisor", new {style="height:40px;", @class = "form-control", id="supervisorId" })
                     <div class="invalid-feedback">
                         Please enter a valid supervisor.
                     </div>

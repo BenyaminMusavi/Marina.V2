@@ -1,0 +1,129 @@
+﻿@model Marina.UI.Models.RegisterVm;
+
+@using (Html.BeginForm("Register", "Account", FormMethod.Post))
+{
+
+    <div style="display:flex; width:100%; min-height:600px; justify-content:center; align-items:center;">
+
+        <div style="width:100%; max-width:600px; box-shadow:10px 10px 80px rgba(0,0,0,0.1); border-radius:18px; padding:24px;  display: flex; flex-direction: column;">
+
+
+            <form id="registration-form" class="needs-validation" novalidate>
+
+                <span style="font-weight:700; font-size: 20px; margin-bottom: 20px;">Register</span>
+
+                <div class="form-outline mb-4">
+                    <label for="distributorname" class="form-label">Distributor`s Name</label>
+                    <input type="text" class="form-control" id="distributorname" name="distributorname" required>
+                    <div class="invalid-feedback">
+                        Please enter a valid distributorname.
+                    </div>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label for="phonenumber" class="form-label">Phone Number</label>
+                    <input type="number" class="form-control" id="phonenumber" name="phonenumber" required>
+                    <div class="invalid-feedback">
+                        Please enter a valid phonenumber.
+                    </div>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label for="region" class="form-label">Region</label>
+                    @Html.DropDownListFor(model => model.RegionId,ViewBag.RegionList as SelectList ,"select a region", new {style="height:40px;" , @class = "form-control", id="regionId" })
+                    <div class="invalid-feedback">
+                        Please enter a valid region.
+                    </div>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label for="rsm" class="form-label">RSM</label>
+                    @Html.DropDownListFor(model => model.RSMId,ViewBag.RSMList as SelectList ,"select a rsm", new {style="height:40px;" ,@class = "form-control", id="rsmId" })
+                    <div class="invalid-feedback">
+                        Please enter a valid rsm.
+                    </div>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label for="nsm" class="form-label">NSM</label>
+                    @Html.DropDownListFor(model => model.NsmId,ViewBag.NsmList as SelectList ,"select a nsm", new {style="height:40px;" ,@class = "form-control", id="nsmId" })
+                    <div class="invalid-feedback">
+                        Please enter a valid nsm.
+                    </div>
+
+                </div>
+                <div class="form-outline mb-4">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                    <div class="invalid-feedback">
+                        Please enter a valid username.
+                    </div>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label for="distributorId" class="form-label">Distributor Code</label>
+                    @Html.DropDownListFor(model => model.DistributorId,ViewBag.DistributorList as SelectList ,"select a distributor code", new {style="height:40px;", @class = "form-control", id="distributorId" })
+                    <div class="invalid-feedback">
+                        Please enter a valid distributorId.
+                    </div>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label for="line" class="form-label">Line</label>
+                    @Html.DropDownListFor(model => model.LineId,ViewBag.LineList as SelectList ,"select a line", new {style="height:40px;", @class = "form-control", id="lineId" })
+                    <div class="invalid-feedback">
+                        Please enter a valid line.
+                    </div>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label for="province" class="form-label">Province</label>
+                    @Html.DropDownListFor(model => model.ProvinceId,ViewBag.ProvinceList as SelectList ,"select a province", new {style="height:40px;", @class = "form-control", id="provinceId" })
+                    <div class="invalid-feedback">
+                        Please enter a valid province.
+                    </div>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label for="supervisor" class="form-label">Supervisor</label>
+                    @Html.DropDownListFor(model => model.SupervisorId,ViewBag.SupervisorList as SelectList ,"select a supervisor", new {style="height:40px;", @class = "form-control", id="supervisorId" })
+                    <div class="invalid-feedback">
+                        Please enter a valid supervisor.
+                    </div>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                    <div class="invalid-feedback">
+                        Please enter a valid password.
+                    </div>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label for="confirmpassword" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirmpassword" name="confirmpassword" required>
+                    <div class="invalid-feedback">
+                        Please enter a valid confirmpassword.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Register</button>
+
+            </form>
+        </div>
+    </div>
+}
+
+@*<script>
+    $(function () {
+        var validator = new RegistrationValidator();
+
+        $('#registration-form').submit(function (event) {
+            if (!validator.validate()) {
+                event.preventDefault();
+            }
+        });
+    });
+
+</script>*@

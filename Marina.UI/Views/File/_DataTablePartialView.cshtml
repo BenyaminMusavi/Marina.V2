@@ -1,0 +1,29 @@
+﻿@model System.Data.DataTable
+@using System.Data
+
+@if (Model != null)
+{
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    @for (int i = 2; i < Model.Columns.Count; i++)
+                    {
+                        <th>@Model.Columns[i].ColumnName</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (DataRow row in Model.Rows)
+                {
+                    <tr>
+                        @for (int i = 2; i < Model.Columns.Count; i++)
+                        {
+                            <td>@row[Model.Columns[i].ColumnName]</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

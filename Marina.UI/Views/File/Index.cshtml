@@ -1,0 +1,71 @@
+﻿@model System.Data.DataTable
+@using System.Data
+@{
+    ViewData["Title"] = "Import";
+}
+
+<form id="upload-form">
+    <input type="file" name="file" id="file-input">
+</form>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="btn-close close-modal-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            @using (Html.BeginForm("SaveDataTable", "Import", FormMethod.Post))
+            {
+                <div class="modal-body">
+                    @if (Model != null)
+                    {
+                        @Html.Partial("_DataTablePartialView", Model)
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger close-modal-btn" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-defualt">Submit</button>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('file-input');
+
+    function clearModalContent() {
+        $('#exampleModal .modal-body').html('');
+        fileInput.value = '';
+    }
+    fileInput.onchange = function () {
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        $.ajax({
+            url: '@Url.Action("Upload","Import")',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success:
+                function (data) {
+                    $('#exampleModal .modal-body').html(data);
+                    // Update the content of the existing modal
+                    $('#exampleModal').modal('show');
+                    // Open the modal
+                },
+            error: function (xhr, status, error) {
+                console.log(xhr.responseText);
+            }
+        });
+    };
+
+    $('#exampleModal').on('click', '.close-modal-btn', function () { $('#exampleModal').modal('hide'); clearModalContent(); });
+
+
+</script>
+

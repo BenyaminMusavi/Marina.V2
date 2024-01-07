@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                @*<a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Logo</a>*@
+                <div class="navbar-brand">
+                    <img width="40" ; height="40" ; style="max-width:40px; max-height:40px;" alt="logo" src="~/images/marina.png" />
+                </div>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <div class="navbar-nav flex-grow-1">
+
+                        <div class="d-flex justify-content-between w-100">
+                            <div class="d-flex">
+
+                                <div class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                                </div>
+                                @*     <div class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home"
+                                asp-action="Privacy">Privacy</a>
+                                </div>*@
+
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <div class="nav-item">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Import"
+                                       asp-action="Index">Import</a>
+                                    </div>
+
+                                    @*                                    <button type="button" class="btn btn-primary" onclick="openModal()">Open Modal</button>
+                                *@
+
+                                    @if (User.IsInRole("admin"))
+                                    {
+                                        <div class="nav-item">
+                                            <a class="nav-link text-dark" asp-area="" asp-controller="Account"
+                                       asp-action="List">Panel Admin</a>
+                                        </div>
+                                    }
+                                }
+                            </div>
+
+                        </div>
+                        <div class="d-flex">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                @*@if (@User.Claims.Any(x => x.Type == System.Security.Claims.ClaimTypes.Name))
+                            {
+                            <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Account" asp-action="Profile">
+                            @User.Claims.FirstOrDefault(x => x.Type == System.Security.Claims.ClaimTypes.Name).Value
+                            </a>
+                            </li>
+                            }*@
+
+                                <div class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account"
+                                   asp-action="Logout">Logout</a>
+                                </div>
+
+                            }
+                            else
+                            {
+                                <div class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account"
+                                   asp-action="Login">Login</a>
+                                </div>
+
+                                <div class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account"
+                                   asp-action="Register">Register</a>
+                                </div>
+
+
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="">
+            @RenderBody()
+        </main>
+    </div>
+
+@*    <partial name="~/Views/_CookieConsent.cshtml" />
+*@
+    @*    <footer class="border-top footer text-muted">
+    <div class="container">
+    &copy; 2021 - CookieReaders - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    </div>
+    </footer>*@
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>
+
+<script>
+    function openModal() {
+        $.ajax({
+            url: '/Controller/Action',
+            type: 'GET',
+            success: function (data) {
+                $('#myModal .modal-body').html(data);
+                $('#myModal').modal('show');
+            }
+        });
+    }
+
+</script>

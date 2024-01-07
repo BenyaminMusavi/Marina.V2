@@ -1,0 +1,65 @@
+﻿@model List<AccountDto>
+
+@{
+    ViewBag.Title = "List";
+}
+
+<div>
+    @if (Model != null)
+    {
+        var model = Model.ToList();
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayName("Id")</th>
+                        <th>@Html.DisplayName("First Name")</th>
+                        <th>@Html.DisplayName("Last Name")</th>
+                        <th>@Html.DisplayName("Agency Code")</th>
+                        <th>@Html.DisplayName("Line")</th>
+                        <th>@Html.DisplayName("Province")</th>
+                        <th>@Html.DisplayName("Status")</th>
+                        <th style="text-align:right">@Html.DisplayName("Action")</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.DistributorName</td>
+                            <td>@item.RSMId</td>
+                            <td>@item.RegionId</td>
+                            <td>@item.LineId</td>
+                            <td>@item.ProvinceId</td>
+                            <td>
+                                @if (item.IsActive)
+                                    @Html.DisplayName("فعال")
+                                else
+                                {
+                                    @Html.DisplayName("غیر فعال")
+                                }
+                            </td>
+                            <td>
+                                @using (Html.BeginForm("Delete", "Account", new { @class = "inline-block", id = item.Id }, FormMethod.Post))
+                                {
+                                    string confirm = "آیا برای حذف ضمیمه " + item.DistributorName + " مطمئن هستید؟";
+                                    <input type="submit" class="btn btn-danger btn-xs" value="Delete" onclick="return confirm('@confirm');" />
+                                }
+                            </td>
+
+                            <td>
+                                @using (Html.BeginForm("Active", "Account", new { id = @item.Id }, FormMethod.Post))
+                                {
+                                    string confirm = "آیا برای تغییر وضعیت " + item.DistributorName + " مطمئن هستید؟";
+                                    <input type="submit" class="btn btn-danger btn-xs" value="تغییر وضعیت" onclick="return confirm('@confirm');" />
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

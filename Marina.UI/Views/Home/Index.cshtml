@@ -1,0 +1,58 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div class="col-xs-12 col-sm-6 col-lg-3 right">
+
+    <div class="form-group rtl my-select">
+        @Html.Label("کشور")
+        @Html.DropDownList("Cntry_Code", await Marina.UI.General.Helper.GetRegionDropDown(), new { @class = "form-control", id = "Country" })
+    </div>
+</div>
+@*<div class="col-xs-12 col-sm-6 col-lg-3 right">
+
+    <div class="form-group rtl my-select">
+        @Html.Label("Region")
+        @Html.DropDownList("Name",await Marina.UI.General.Helper.GetRegionList(), new { @class = "form-control", id = "Region" })
+    </div>
+</div>
+
+<div class="col-xs-12 col-sm-6 col-lg-3 right">
+    <div class="form-group rtl my-select">
+        @Html.Label("Region")
+        @Html.DropDownList("SelectedRegion", (IEnumerable<SelectListItem>)ViewBag.RegionList, new { @class = "form-control", id = "Region" })
+    </div>
+</div>*@
+
+@*<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // درخواست به اکشن GetDropDown برای دریافت اطلاعات
+        $.ajax({
+            type: 'POST',
+            url: '/Region/GetDropDown',
+            // مسیر اکشن
+            success: function (data) {
+                // به‌روزرسانی DropDownList با اطلاعات جدید
+                $('#Region').empty();
+                // پاک کردن آیتم‌های فعلی
+                $.each(data, function (index, item) {
+                    $('#Region').append($('<option>',
+                        {
+                            value: item.Value,
+                            text: item.Text
+                        }));
+                });
+            },
+            error: function () {
+                console.log('Error in retrieving data.');
+            }
+        });
+    });
+
+</script>*@

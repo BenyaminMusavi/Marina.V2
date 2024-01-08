@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Marina.DataAccess.Tools;
 
@@ -16,20 +17,42 @@ public interface ITableChecker
 
 }
 
-public class TableChecker: ITableChecker
+public class TableChecker : ITableChecker
 {
     private readonly MarinaDbContext _context;
-    public TableChecker(MarinaDbContext context)
+    private readonly IConfiguration _configuration;
+
+    public TableChecker(MarinaDbContext context, IConfiguration configuration)
     {
         _context = context;
+        _configuration = configuration;
     }
 
+    //public async Task<bool> TableExistsAsync(string tableName)
+    //{
+    //    var query = $"SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = {tableName}";
+    //    var result = await _context.Database.ExecuteSqlRawAsync(query);
+    //    var tableExists = result > 0;
+    //    return tableExists;
+    //}
     public async Task<bool> TableExistsAsync(string tableName)
     {
-        var query = $"SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = {tableName}";
-        var result = await _context.Database.ExecuteSqlRawAsync(query);
-        var tableExists = result > 0;
-        return tableExists;
+        try
+        {
+            var conn = _configuration["ConnectionStrings:MarinaConnectionString"];
+
+            using SqlConnection connection = new(conn);
+            connection.Open();
+            var query = $"SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{tableName}'";
+            SqlCommand command = new(query, connection);
+            var result = await command.ExecuteScalarAsync();
+            return result != null;
+        }
+        catch (Exception)
+        {
+            // Log or handle the exception if needed
+            return false;
+        }
     }
 
     public async Task<int> DeleteEntitiesAsync(string tableName, string date)

@@ -30,10 +30,7 @@
 
                 <div class="form-outline mb-4">
                     <label for="region" class="form-label">Region</label>
-                    @*                    @Html.DropDownListFor(model => model.RegionId,ViewBag.RegionList as SelectList ,"select a region", new {style="height:40px;" , @class = "form-control", id="regionId" })
-                *@                    @Html.DropDownListFor(model => model.RegionId, await Marina.UI.General.Helper.GetDropDown("Region") ,"select a region", new {style="height:40px;" , @class = "form-control", id="regionId" })
-                    @*                    @Html.DropDownList("Cntry_Code", await Marina.UI.General.Helper.GetRegionDropDown(), new { @class = "form-control", id = "Country" })
-                *@
+                    @Html.DropDownListFor(model => model.RegionId, await Marina.UI.General.Helper.GetDropDown("Region") ,"select a region", new {style="height:40px;" , @class = "form-control", id="regionId" })
                     <div class="invalid-feedback">
                         Please enter a valid region.
                     </div>
@@ -41,7 +38,6 @@
 
                 <div class="form-outline mb-4">
                     <label for="rsm" class="form-label">RSM</label>
-                    @*@Html.DropDownListFor(model => model.RSMId,ViewBag.RSMList as SelectList ,"select a rsm", new {style="height:40px;" ,@class = "form-control", id="rsmId" })*@
                     @Html.DropDownListFor(model => model.RSMId,await Marina.UI.General.Helper.GetDropDown("RSM") ,"select a rsm", new {style="height:40px;" ,@class = "form-control", id="rsmId" })
                     <div class="invalid-feedback">
                         Please enter a valid rsm.
@@ -50,13 +46,12 @@
 
                 <div class="form-outline mb-4">
                     <label for="nsm" class="form-label">NSM</label>
-                    @*@Html.DropDownListFor(model => model.NsmId,ViewBag.NsmList as SelectList ,"select a nsm", new {style="height:40px;" ,@class = "form-control", id="nsmId" })*@
                     @Html.DropDownListFor(model => model.NsmId,await Marina.UI.General.Helper.GetDropDown("NSM") ,"select a nsm", new {style="height:40px;" ,@class = "form-control", id="nsmId" })
                     <div class="invalid-feedback">
                         Please enter a valid nsm.
                     </div>
-
                 </div>
+
                 <div class="form-outline mb-4">
                     <label for="username" class="form-label">Username</label>
                     <input type="text" class="form-control" id="username" name="username" required>
@@ -67,34 +62,33 @@
 
                 <div class="form-outline mb-4">
                     <label for="distributorId" class="form-label">Distributor Code</label>
-                    @*@Html.DropDownListFor(model => model.DistributorId,ViewBag.DistributorList as SelectList ,"select a distributor code", new {style="height:40px;", @class = "form-control", id="distributorId" })*@
                     @Html.DropDownListFor(model => model.DistributorId,await Marina.UI.General.Helper.GetDropDown("Distributor") ,"select a distributor code", new {style="height:40px;", @class = "form-control", id="distributorId" })
                     <div class="invalid-feedback">
                         Please enter a valid distributorId.
                     </div>
+                    @Html.HiddenFor(model => model.DistributorCode, new { id = "distributorCode" })
                 </div>
 
                 <div class="form-outline mb-4">
                     <label for="line" class="form-label">Line</label>
-                    @*@Html.DropDownListFor(model => model.LineId,ViewBag.LineList as SelectList ,"select a line", new {style="height:40px;", @class = "form-control", id="lineId" })*@
                     @Html.DropDownListFor(model => model.LineId,await Marina.UI.General.Helper.GetDropDown("Line") ,"select a line", new {style="height:40px;", @class = "form-control", id="lineId" })
                     <div class="invalid-feedback">
                         Please enter a valid line.
                     </div>
+                    @Html.HiddenFor(model => model.LineName, new { id = "lineName" })
                 </div>
 
                 <div class="form-outline mb-4">
                     <label for="province" class="form-label">Province</label>
-                    @*@Html.DropDownListFor(model => model.ProvinceId,ViewBag.ProvinceList as SelectList ,"select a province", new {style="height:40px;", @class = "form-control", id="provinceId" })*@
                     @Html.DropDownListFor(model => model.ProvinceId,await Marina.UI.General.Helper.GetDropDown("Province") ,"select a province", new {style="height:40px;", @class = "form-control", id="provinceId" })
                     <div class="invalid-feedback">
                         Please enter a valid province.
                     </div>
+                    @Html.HiddenFor(model => model.ProvinceName, new { id = "provinceName" })
                 </div>
 
                 <div class="form-outline mb-4">
                     <label for="supervisor" class="form-label">Supervisor</label>
-                    @*@Html.DropDownListFor(model => model.SupervisorId,ViewBag.SupervisorList as SelectList ,"select a supervisor", new {style="height:40px;", @class = "form-control", id="supervisorId" })*@
                     @Html.DropDownListFor(model => model.SupervisorId,await Marina.UI.General.Helper.GetDropDown("Supervisor") ,"select a supervisor", new {style="height:40px;", @class = "form-control", id="supervisorId" })
                     <div class="invalid-feedback">
                         Please enter a valid supervisor.
@@ -124,15 +118,26 @@
     </div>
 }
 
-@*<script>
-    $(function () {
-        var validator = new RegistrationValidator();
-
-        $('#registration-form').submit(function (event) {
-            if (!validator.validate()) {
-                event.preventDefault();
-            }
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#lineId").change(function () {
+            var selectedText = $("#lineId option:selected").text();
+            $("#lineName").val(selectedText);
         });
     });
 
-</script>*@
+    $(document).ready(function () {
+        $("#distributorId").change(function () {
+            var selectedText = $("#distributorId option:selected").text();
+            $("#distributorCode").val(selectedText);
+        });
+    });
+
+    $(document).ready(function () {
+        $("#provinceId").change(function () {
+            var selectedText = $("#provinceId option:selected").text();
+            $("#provinceName").val(selectedText);
+        });
+    });
+</script>

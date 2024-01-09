@@ -6,6 +6,7 @@ using Marina.UI.General;
 
 namespace Marina.UI.Controllers;
 
+[Authorize]
 public class AccountController : BaseController
 {
     private readonly IAccountService _service;
@@ -43,7 +44,8 @@ public class AccountController : BaseController
         if (user is not null)
         {
             await _service.SignIn(this.HttpContext, user, false);
-            var redirectPath = user.UserId == 1 ? "~/Account/list" : "~/";
+            //var redirectPath = user.UserId == 1 ? "~/Account/list" : "~/";
+            var redirectPath = "/";
             return LocalRedirect(redirectPath);
         }
         return View(model);

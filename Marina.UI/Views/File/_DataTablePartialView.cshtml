@@ -1,8 +1,13 @@
 ﻿@model System.Data.DataTable
 @using System.Data
 
-@if (Model != null)
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
 {
+    <div class="error-message">
+        @Html.Raw(ViewBag.ErrorMessage)
+    </div>
+}   
+else{
     <div class="table-wrapper">
         <table>
             <thead>
@@ -27,3 +32,10 @@
         </table>
     </div>
 }
+
+<style>
+    .error-message {
+        color: red;
+        margin-top: 10px;
+    }
+</style>

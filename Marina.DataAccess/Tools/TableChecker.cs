@@ -1,7 +1,9 @@
 ﻿using System.Data;
+using System.Reflection.PortableExecutable;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Marina.DataAccess.Tools;
 
@@ -11,8 +13,8 @@ public interface ITableChecker
     Task<int> DeleteEntitiesAsync(string tableName, string date);
     Task<bool> CreateTableAsync(string query);
     List<string> SelectColumnNameTable(string tableName);
-    bool ColumnMapping(DataTable sourceDataTable, string tableName);
     Task<bool> SaveAsync(string tableName, DataTable dataTable);
+    Task<bool> SaveAsync2(string tableName, DataTable dataTable, List<string>? strings);
 
 
 }
@@ -28,13 +30,6 @@ public class TableChecker : ITableChecker
         _configuration = configuration;
     }
 
-    //public async Task<bool> TableExistsAsync(string tableName)
-    //{
-    //    var query = $"SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = {tableName}";
-    //    var result = await _context.Database.ExecuteSqlRawAsync(query);
-    //    var tableExists = result > 0;
-    //    return tableExists;
-    //}
     public async Task<bool> TableExistsAsync(string tableName)
     {
         try
@@ -68,9 +63,10 @@ public class TableChecker : ITableChecker
         var tableExists = result > 0;
         return tableExists;
     }
+
     public List<string> SelectColumnNameTable(string tableName)
     {
-        var sql = $"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{tableName}'";
+        var sql = $"SELECT TOP (0) * FROM {tableName}";
         using (var command = _context.Database.GetDbConnection().CreateCommand())
         {
             command.CommandText = sql;
@@ -78,86 +74,73 @@ public class TableChecker : ITableChecker
             _context.Database.OpenConnection();
             using (var result = command.ExecuteReader())
             {
-                var columnNames = Enumerable.Range(0, result.FieldCount).Select(i => result.GetName(i)).ToList();
+                var columnNames = Enumerable.Range(0, result.FieldCount)
+                    .Select(i => result.GetName(i))
+                    .ToList();
                 return columnNames;
             }
         }
     }
 
-    public bool ColumnMapping(DataTable sourceDataTable, string tableName)
+    private static bool ColumnMapping(DataTable dataTable, SqlBulkCopy bulkCopy, List<string> destinationColumnNames)
     {
         try
         {
-            var destinationColumns = SelectColumnNameTable(tableName);
-            var bulkCopy = new SqlBulkCopy(_context.Database.GetDbConnection().ConnectionString);
+            //        //bool areEqual = list1.Count == list2.Count && list1.All(x => list2.Contains(x));
 
-            foreach (DataColumn column in sourceDataTable.Columns)
+            foreach (DataColumn column in dataTable.Columns)
             {
                 var sourceColumn = column.ColumnName.Replace(" ", "");
-                var isValid = destinationColumns.Contains(sourceColumn);
+                var isValid = destinationColumnNames.Contains(sourceColumn);
                 if (isValid)
                     bulkCopy.ColumnMappings.Add(sourceColumn, sourceColumn);
                 else
                     return false;
             }
             return true;
-
         }
         catch (Exception ex)
         {
             throw new Exception("Error mapping columns: " + ex.Message);
         }
     }
-
     public async Task<bool> SaveAsync(string tableName, DataTable dataTable)
     {
-        try
+        var conn = _configuration["ConnectionStrings:MarinaConnectionString"];
+
+        using (SqlConnection con = new(conn))
         {
-            await _context.Database.OpenConnectionAsync();
-            await using (var transaction = _context.Database.BeginTransaction())
+            using (SqlBulkCopy bulkCopy = new(con))
             {
                 try
                 {
-                    await DeleteEntitiesAsync(tableName, GetPersianDate());
+                    con.Open();
 
-                    // ایجاد جدول موقت
-                    await _context.Database.ExecuteSqlRawAsync($"CREATE TABLE #TempTable AS SELECT  FROM {tableName} WHERE 1 = 0");
+                    var destinationColumnName = SelectColumnNameTable(tableName);
+                    var isValidColumnMapping = ColumnMapping(dataTable, bulkCopy, destinationColumnName);
+                    if (!isValidColumnMapping)
+                        return false;
 
-                    // نسخه اطلاعات از DataTable به جدول موقت
-                    await BulkCopyToTempTableAsync(dataTable);
-
-                    // اجرای دستور SQL برای اضافه کردن اطلاعات از جدول موقت به جدول اصلی
-                    var sql = $"INSERT INTO {tableName} SELECT  FROM #TempTable";
-                    await _context.Database.ExecuteSqlRawAsync(sql);
-
-                    // حذف جدول موقت
-                    await _context.Database.ExecuteSqlRawAsync("DROP TABLE #TempTable");
-                    transaction.Commit();
+                    var Date = GetPersianDate();
+                    var queryDeleted = $"DELETE FROM {tableName} WHERE PerDate = @Date";
+                    using (SqlCommand commandDeleted = new(queryDeleted, con))
+                    {
+                        commandDeleted.Parameters.AddWithValue("@Date", Date);
+                        var rowsAffected = commandDeleted.ExecuteNonQuery();
+                    }
+                    bulkCopy.DestinationTableName = tableName;
+                    await bulkCopy.WriteToServerAsync(dataTable);
                 }
                 catch (Exception ex)
                 {
-                    transaction.Rollback();
                     Console.WriteLine("خطا در ذخیره سازی داده ها: " + ex.Message);
                     return false;
                 }
             }
-            return true;
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine("خطا در اتصال به دیتابیس: " + ex.Message);
-            return false;
-        }
+        return true;
     }
 
-    private async Task BulkCopyToTempTableAsync(DataTable dataTable)
-    {
-        using (var bulkCopy = new SqlBulkCopy(_context.Database.GetDbConnection().ConnectionString))
-        {
-            bulkCopy.DestinationTableName = "#TempTable";
-            await bulkCopy.WriteToServerAsync(dataTable);
-        }
-    }
     private static string GetPersianDate()
     {
         System.Globalization.PersianCalendar persianCalandar = new();
@@ -166,4 +149,61 @@ public class TableChecker : ITableChecker
         string month = persianCalandar.GetMonth(dateTime).ToString("0#");
         return $"{year}{month}";
     }
+
+
+    public async Task<bool> SaveAsync2(string tableName, DataTable dataTable, List<string>? strings)
+    {
+        var conn = _configuration["ConnectionStrings:MarinaConnectionString"];
+
+        using (SqlConnection con = new(conn))
+        {
+            using (SqlBulkCopy bulkCopy = new(con))
+            {
+                try
+                {
+                    con.Open();
+
+                    var destinationColumnName = new List<string>();
+                    var sql = $"SELECT TOP (0) * FROM {tableName}";
+                    using (var command = _context.Database.GetDbConnection().CreateCommand())
+                    {
+                        command.CommandText = sql;
+                        command.CommandType = CommandType.Text;
+                        _context.Database.OpenConnection();
+                        using (var result = command.ExecuteReader())
+                        {
+                            destinationColumnName = Enumerable.Range(0, result.FieldCount)
+                                .Select(i => result.GetName(i))
+                                .ToList();
+                        }
+                    }
+
+                    if (strings is not null)
+                    {
+                        foreach (string column in dataTable.Columns)
+                        {
+                            bulkCopy.ColumnMappings.Add(column, column);
+                        }
+                    }
+
+                    var Date = GetPersianDate();
+                    var queryDeleted = $"DELETE FROM {tableName} WHERE PerDate = @Date";
+                    using (SqlCommand commandDeleted = new(queryDeleted, con))
+                    {
+                        commandDeleted.Parameters.AddWithValue("@Date", Date);
+                        var rowsAffected = commandDeleted.ExecuteNonQuery();
+                    }
+                    bulkCopy.DestinationTableName = tableName;
+                    await bulkCopy.WriteToServerAsync(dataTable);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("خطا در ذخیره سازی داده ها: " + ex.Message);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
+

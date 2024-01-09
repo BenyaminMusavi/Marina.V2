@@ -11,11 +11,12 @@ namespace Marina.BusinessLogic.Files;
 public interface IExcelFileProcessor
 {
     DataTable ProcessExcelFile(ClaimsPrincipal user, IFormFile upload);
-    Task<bool> Save(DataTable dataTable, string tableName);
+    Task<bool> Save(DataTable dataTable, string tableName, List<string> a);
     Task<bool> TableExists(string tableName);
-    Task<bool> CreateTable(DataTable dataTable, string tableName);
+    Task<bool> CreateTable(DataColumnCollection columns, string tableName);
     Task DeleteRows(string tableName);
-    bool IsValid(DataTable dataTable, string tableName);
+    bool IsValid(List<string> column, List<string> destinationColumn, out string errorMessage);
+    List<string> SelectColumnNameTable(string tableName);
 }
 
 public class ExcelFileProcessor : IExcelFileProcessor
@@ -32,7 +33,7 @@ public class ExcelFileProcessor : IExcelFileProcessor
     {
         using var reader = GetExcelDataReader(upload);
         var excelDataTableBuilder = new ExcelDataTableBuilder();
-        return excelDataTableBuilder.BuildDataTable(user ,reader);
+        return excelDataTableBuilder.BuildDataTable(user, reader);
     }
 
     private static IExcelDataReader GetExcelDataReader(IFormFile upload)
@@ -54,32 +55,43 @@ public class ExcelFileProcessor : IExcelFileProcessor
         await _tableChecker.DeleteEntitiesAsync(tableName, date);
     }
 
-    public async Task<bool> CreateTable(DataTable dataTable, string tableName)
+    public async Task<bool> CreateTable(DataColumnCollection columns, string tableName)
     {
-        var query = CreateQueryTable(dataTable, tableName);
+        var query = CreateQueryTable(columns, tableName);
         return await _tableChecker.CreateTableAsync(query);
     }
 
-    public bool IsValid(DataTable dataTable, string tableName)
+    public bool IsValid(List<string> sourceColumns, List<string> destinationColumns, out string errorMessage)
     {
-        return _tableChecker.ColumnMapping(dataTable, tableName);
+        sourceColumns.Add("Id");
+        var itemsInList1NotInList2 = sourceColumns.Except(destinationColumns);
+        var itemsInList2NotInList1 = destinationColumns.Except(sourceColumns);
+        var allUniqueItems = itemsInList2NotInList1.Union(itemsInList1NotInList2);
+
+        var stringBuilder = new StringBuilder();
+        foreach (var item in allUniqueItems)
+        {
+            stringBuilder.AppendLine($"The column '{item}' does not exist in the database table.");
+        }
+        errorMessage = stringBuilder.ToString().Trim();
+        return string.IsNullOrEmpty(errorMessage);
     }
 
-    public async Task<bool> Save(DataTable dataTable, string tableName)
+    public async Task<bool> Save(DataTable dataTable, string tableName, List<string> a)
     {
-        return await _tableChecker.SaveAsync(tableName, dataTable);
+        return await _tableChecker.SaveAsync2(tableName, dataTable, a);
     }
 
-    private string CreateQueryTable(DataTable dataTable, string tableName)
+    private string CreateQueryTable(DataColumnCollection columns, string tableName)
     {
         var databaseName = _configuration["Database:Name"];
 
         var queryBuilder = new StringBuilder();
         queryBuilder.Append($"USE [{databaseName}]; CREATE TABLE DBO.[{tableName}] (Id INT IDENTITY(1, 1), ");
 
-        foreach (DataColumn column in dataTable.Columns)
+        foreach (string column in columns)
         {
-            string columnName = column.ColumnName.Replace(" ", "");
+            string columnName = column.Replace(" ", "");
             queryBuilder.Append($"{columnName} nvarchar(100) NULL,");
         }
 
@@ -96,5 +108,10 @@ public class ExcelFileProcessor : IExcelFileProcessor
         string year = persianCalandar.GetYear(dateTime).ToString().Substring(2, 2);
         string month = persianCalandar.GetMonth(dateTime).ToString("0#");
         return $"{year}{month}";
+    }
+
+    public List<string> SelectColumnNameTable(string tableName)
+    {
+        return _tableChecker.SelectColumnNameTable(tableName);
     }
 }

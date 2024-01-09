@@ -1,5 +1,7 @@
 ﻿@model System.Data.DataTable
 @using System.Data
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Converters;
 @{
     ViewData["Title"] = "Import";
 }
@@ -16,7 +18,7 @@
                 <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
                 <button type="button" class="btn-close close-modal-btn" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            @using (Html.BeginForm("SaveDataTable", "Import", FormMethod.Post))
+            @using (Html.BeginForm("Import", "File", FormMethod.Post))
             {
                 <div class="modal-body">
                     @if (Model != null)
@@ -46,7 +48,7 @@
         formData.append('file', fileInput.files[0]);
 
         $.ajax({
-            url: '@Url.Action("Upload","Import")',
+            url: '@Url.Action("Upload","File")',
             type: 'POST',
             data: formData,
             processData: false,

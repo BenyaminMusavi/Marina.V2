@@ -106,13 +106,13 @@ public class AccountService : IAccountService
 
     public CookieUserItem Validate(LoginDto model)
     {
-        var userRecords = (_userRepository.AsQueryable());
-        //.Where(x => x.UserName == model.Username && x.IsActive)
-        //.Include(x => x.Distributor)
-        //.Include(x => x.Line)
-        //.Include(x => x.Province);
+        var userRecords = (_userRepository.AsQueryable())
+        .Where(x => x.UserName == model.Username && x.IsActive)
+        .Include(x => x.Distributor)
+        .Include(x => x.Line)
+        .Include(x => x.Province);
 
-        var results = userRecords //.AsEnumerable()
+        var results = userRecords.AsEnumerable()
         .Where(m => m.PasswordHash == Hasher.GenerateHash(model.Password, m.Salt))
         .Select(m => new CookieUserItem
         {

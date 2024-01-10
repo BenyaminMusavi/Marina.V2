@@ -8,6 +8,12 @@
 
 <form id="upload-form">
     <input type="file" name="file" id="file-input">
+
+    <button id="excelbutton" type="button" class="btn btn-info right">
+        <i class="fa fa-file-text-o left"></i>
+        دریافت فایل اکسل
+    </button>
+
 </form>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
@@ -68,6 +74,8 @@
 
     $('#exampleModal').on('click', '.close-modal-btn', function () { $('#exampleModal').modal('hide'); clearModalContent(); });
 
-
+    $("#excelbutton").on("click", function () {
+        window.location.href = '@Url.Action("DownloadExcel", "File")' + '?' + $('#File').serialize();
+    });
 </script>
 

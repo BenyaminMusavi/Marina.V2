@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Security.Claims;
 using System.Text;
+using ClosedXML.Excel;
 using ExcelDataReader;
 using Marina.DataAccess.Tools;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +18,7 @@ public interface IExcelFileProcessor
     Task DeleteRows(string tableName);
     bool IsValid(List<string> column, List<string> destinationColumn, out string errorMessage);
     List<string> SelectColumnNameTable(string tableName);
+    byte[] CreateExcelFileResult(string[] columnNames);
 }
 
 public class ExcelFileProcessor : IExcelFileProcessor
@@ -71,7 +73,7 @@ public class ExcelFileProcessor : IExcelFileProcessor
         var stringBuilder = new StringBuilder();
         foreach (var item in allUniqueItems)
         {
-            stringBuilder.AppendLine($"The column '{item}' does not exist in the database table.");
+            stringBuilder.AppendLine($"The column '{item}' does not exist in the database table.\n");
         }
         errorMessage = stringBuilder.ToString().Trim();
         return string.IsNullOrEmpty(errorMessage);
@@ -113,5 +115,23 @@ public class ExcelFileProcessor : IExcelFileProcessor
     public List<string> SelectColumnNameTable(string tableName)
     {
         return _tableChecker.SelectColumnNameTable(tableName);
+    }
+
+    public byte[] CreateExcelFileResult(string[] columnNames)
+    {
+        var workbook = new XLWorkbook();
+        var worksheet = workbook.Worksheets.Add("Sheet1");
+
+        for (int i = 0; i < columnNames.Length; i++)
+        {
+            worksheet.Cell(1, i + 1).Value = columnNames[i];
+        }
+
+        using (var stream = new System.IO.MemoryStream())
+        {
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
+
     }
 }

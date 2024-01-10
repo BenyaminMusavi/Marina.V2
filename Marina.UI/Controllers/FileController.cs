@@ -5,7 +5,7 @@ using Marina.UI.Models;
 using System.Data;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Marina.UI.Controllers;
 [Authorize]
@@ -68,6 +68,21 @@ public class FileController : BaseController
         return RedirectToAction("Index");
     }
 
+    public IActionResult DownloadExcel()
+    {
+        if (!tableName.IsNullOrEmpty())
+        {
+            var columnNames = _excelFileProcessor.SelectColumnNameTable(tableName).Skip(3).ToArray();
+
+            var fileName = $"File-{GetDateMonthName(DateTime.Now).Replace("-", "")}.xlsx";
+
+            var excelBytes = _excelFileProcessor.CreateExcelFileResult(columnNames);
+
+            return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+        return RedirectToAction("Index");
+    }
+
     private static string SetTableName()
     {
         var httpContextAccessor = new HttpContextAccessor();
@@ -76,5 +91,9 @@ public class FileController : BaseController
         var line = httpContextAccessor.HttpContext?.User.FindFirstValue("Line");
         var tblName = $"{distributorCode}_{province}_{line}";
         return tblName;
+    }
+    private static string GetDateMonthName(DateTime date)
+    {
+        return date.ToString("MMM dd HH:mm");
     }
 }

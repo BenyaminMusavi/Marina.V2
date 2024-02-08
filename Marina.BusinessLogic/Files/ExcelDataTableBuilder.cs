@@ -1,6 +1,7 @@
 ﻿using ExcelDataReader;
 using System.Data;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace Marina.BusinessLogic.Files;
 
@@ -27,7 +28,10 @@ public class ExcelDataTableBuilder
         DataTable dt_ = reader.AsDataSet().Tables[0];
         for (int i = 0; i < dt_.Columns.Count; i++)
         {
-            dt.Columns.Add(dt_.Rows[0][i].ToString());
+            var columnName = dt_.Rows[0][i].ToString();
+            var updateColumnName = Regex.Replace(columnName, @"[^a-zA-Z\u0600-\u06FF]+", "_");
+
+            dt.Columns.Add(updateColumnName);
         }
     }
 

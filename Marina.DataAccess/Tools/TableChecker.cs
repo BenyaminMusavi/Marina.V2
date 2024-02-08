@@ -90,7 +90,8 @@ public class TableChecker : ITableChecker
 
             foreach (DataColumn column in dataTable.Columns)
             {
-                var sourceColumn = column.ColumnName.Replace(" ", "");
+                //var sourceColumn = column.ColumnName.Replace(" ", "");
+                var sourceColumn = column.ColumnName;
                 var isValid = destinationColumnNames.Contains(sourceColumn);
                 if (isValid)
                     bulkCopy.ColumnMappings.Add(sourceColumn, sourceColumn);

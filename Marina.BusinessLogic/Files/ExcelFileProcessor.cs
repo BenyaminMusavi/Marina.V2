@@ -93,8 +93,7 @@ public class ExcelFileProcessor : IExcelFileProcessor
 
         foreach (string column in columns)
         {
-            string columnName = column.Replace(" ", "");
-            queryBuilder.Append($"{columnName} nvarchar(100) NULL,");
+            queryBuilder.Append($"[{column}] nvarchar(MAX) NULL,");
         }
 
         queryBuilder.Remove(queryBuilder.Length - 1, 1);

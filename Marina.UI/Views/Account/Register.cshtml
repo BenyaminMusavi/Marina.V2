@@ -111,7 +111,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Register</button>
+                <button type="submit" onclick="submitForm()" class="btn btn-primary">Register</button>
 
             </form>
         </div>
@@ -140,4 +140,31 @@
             $("#provinceName").val(selectedText);
         });
     });
+
+    function submitForm() 
+    {
+        var form = document.getElementById("registration-form");
+        var isValid = form.checkValidity();
+        if (!isValid) 
+        {
+            var elements = form.elements;
+            for (var i = 0; i < elements.length; i++) 
+            {
+                var element = elements[i];
+                if (!element.checkValidity()) 
+                {
+                    var errorElement = document.getElementById("error-" + element.id);
+                    if (errorElement)
+                    {
+                        errorElement.style.color = "red";
+                    }
+                }
+            }
+        }    // ارسال فرم در صورت اعتبارسنجی موفق
+        else 
+        {
+            form.submit();
+        }
+    }
+
 </script>

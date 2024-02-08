@@ -166,26 +166,44 @@ public class TableChecker : ITableChecker
 
                     var destinationColumnName = new List<string>();
                     var sql = $"SELECT TOP (0) * FROM {tableName}";
-                    using (var command = _context.Database.GetDbConnection().CreateCommand())
+                    using (var command = new SqlCommand(sql, con))
                     {
-                        command.CommandText = sql;
-                        command.CommandType = CommandType.Text;
-                        _context.Database.OpenConnection();
-                        using (var result = command.ExecuteReader())
+                        using (var result = await command.ExecuteReaderAsync())
                         {
-                            destinationColumnName = Enumerable.Range(0, result.FieldCount)
-                                .Select(i => result.GetName(i))
-                                .ToList();
+                            for (int i = 0; i < result.FieldCount; i++)
+                            {
+                                destinationColumnName.Add(result.GetName(i));
+                            }
                         }
                     }
 
-                    if (strings is not null)
+                    foreach (var columnMapping in destinationColumnName)
                     {
-                        foreach (string column in dataTable.Columns)
+                        if (dataTable.Columns.Contains(columnMapping))
                         {
-                            bulkCopy.ColumnMappings.Add(column, column);
+                            bulkCopy.ColumnMappings.Add(columnMapping, columnMapping);
                         }
                     }
+
+                    //var destinationColumnName = new List<string>();
+                    //var sql = $"SELECT TOP (0) * FROM {tableName}";
+                    //using (var command = _context.Database.GetDbConnection().CreateCommand())
+                    //{
+                    //    command.CommandText = sql;
+                    //    command.CommandType = CommandType.Text;
+                    //    _context.Database.OpenConnection();
+                    //    using (var result = command.ExecuteReader())
+                    //    {
+                    //        destinationColumnName = Enumerable.Range(0, result.FieldCount)
+                    //            .Select(i => result.GetName(i))
+                    //            .ToList();
+                    //    }
+                    //}
+
+                    //foreach (string column in dataTable.Columns)
+                    //{
+                    //    bulkCopy.ColumnMappings.Add(column, column);
+                    //}
 
                     var Date = GetPersianDate();
                     var queryDeleted = $"DELETE FROM {tableName} WHERE PerDate = @Date";

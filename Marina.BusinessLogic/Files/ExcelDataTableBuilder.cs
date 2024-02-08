@@ -1,4 +1,5 @@
 ﻿using ExcelDataReader;
+using Microsoft.AspNetCore.Http;
 using System.Data;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
@@ -41,7 +42,8 @@ public class ExcelDataTableBuilder
         {
             DataTable dt_ = reader.AsDataSet().Tables[0];
             var Date = GetPersianDate();
-            string? userId = user.Identity?.ToString();
+            //string? userId = user.Identity?.ToString();
+            string userId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             for (int row_ = 1; row_ < dt_.Rows.Count; row_++)
             {
                 DataRow row = dt.NewRow();

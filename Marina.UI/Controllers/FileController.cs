@@ -25,22 +25,23 @@ public class FileController : BaseController
     }
 
     [HttpPost]
-    public IActionResult Upload(IFormFile file)
+    public async Task<IActionResult> Upload(IFormFile file)
     {
         var validationResult = ValidateModel(file, new FileUploadValidator());
         if (!validationResult.IsValid)
             return HandleValidationResult(file, validationResult);
 
         dataTable = _excelFileProcessor.ProcessExcelFile(User, file);
+        var tableExists = await _excelFileProcessor.TableExists(tableName);
 
-        var sourceColumns = dataTable.Columns.Cast<DataColumn>().Select(column => column.ColumnName).ToList();
-        var destinationColumn = _excelFileProcessor.SelectColumnNameTable(tableName);
-
-        _excelFileProcessor.IsValid(sourceColumns, destinationColumn, out string errorMessage);
-        if (!string.IsNullOrEmpty(errorMessage))
+        if (tableExists)
         {
-            ViewBag.ErrorMessage = errorMessage;
-            return PartialView("_DataTablePartialView", dataTable);
+            var sourceColumns = dataTable.Columns.Cast<DataColumn>().Select(column => column.ColumnName).ToList();
+            var destinationColumn = _excelFileProcessor.SelectColumnNameTable(tableName);
+
+            _excelFileProcessor.IsValid(sourceColumns, destinationColumn, out string errorMessage);
+            if (!string.IsNullOrEmpty(errorMessage))
+                ViewBag.ErrorMessage = errorMessage;
         }
 
         return PartialView("_DataTablePartialView", dataTable);
@@ -50,27 +51,30 @@ public class FileController : BaseController
     public async Task<IActionResult> Import()
     {
 
-        var tableExists = await _excelFileProcessor.TableExists(tableName);
+        //var tableExists = await _excelFileProcessor.TableExists(tableName);
 
-        DataColumnCollection dataColumn = dataTable.Columns;
+        //DataColumnCollection dataColumn = dataTable.Columns;
 
-        if (!tableExists)
-            await _excelFileProcessor.CreateTable(dataColumn, tableName);
+        //if (!tableExists)
+        //    await _excelFileProcessor.CreateTable(dataColumn, tableName);
 
 
-        if (tableExists)
-        {
-            var destinationColumn = _excelFileProcessor.SelectColumnNameTable(tableName);
+        //if (tableExists)
+        //{
+        //    var destinationColumn = _excelFileProcessor.SelectColumnNameTable(tableName);
 
-            await _excelFileProcessor.Save(dataTable, tableName, destinationColumn);
-        }
+        //    await _excelFileProcessor.Save(dataTable, tableName, destinationColumn);
+        //}
+        await _excelFileProcessor.Save2(dataTable, tableName);
 
         return RedirectToAction("Index");
     }
 
-    public IActionResult DownloadExcel()
+    public async Task<IActionResult> DownloadExcel()
     {
-        if (!tableName.IsNullOrEmpty())
+        var tableExists = await _excelFileProcessor.TableExists(tableName);
+
+        if (tableExists)
         {
             var columnNames = _excelFileProcessor.SelectColumnNameTable(tableName).Skip(3).ToArray();
 

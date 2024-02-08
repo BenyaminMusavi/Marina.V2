@@ -13,6 +13,7 @@ public interface IExcelFileProcessor
 {
     DataTable ProcessExcelFile(ClaimsPrincipal user, IFormFile upload);
     Task<bool> Save(DataTable dataTable, string tableName, List<string> a);
+    Task<bool> Save2(DataTable dataTable, string tableName);
     Task<bool> TableExists(string tableName);
     Task<bool> CreateTable(DataColumnCollection columns, string tableName);
     Task DeleteRows(string tableName);
@@ -84,6 +85,22 @@ public class ExcelFileProcessor : IExcelFileProcessor
         return await _tableChecker.SaveAsync2(tableName, dataTable, a);
     }
 
+    public async Task<bool> Save2(DataTable dataTable, string tableName)
+    {
+        var tableExists = await TableExists(tableName);
+        List<string> destinationColumn = null;
+
+        if (!tableExists)
+            await CreateTable(dataTable.Columns, tableName);
+
+        if (tableExists)
+            destinationColumn = SelectColumnNameTable(tableName);
+
+        await _tableChecker.SaveAsync2(tableName, dataTable, destinationColumn);
+
+        return true;
+    }
+
     private string CreateQueryTable(DataColumnCollection columns, string tableName)
     {
         var databaseName = _configuration["Database:Name"];
@@ -91,7 +108,7 @@ public class ExcelFileProcessor : IExcelFileProcessor
         var queryBuilder = new StringBuilder();
         queryBuilder.Append($"USE [{databaseName}]; CREATE TABLE DBO.[{tableName}] (Id INT IDENTITY(1, 1), ");
 
-        foreach (string column in columns)
+        foreach (var column in columns)
         {
             queryBuilder.Append($"[{column}] nvarchar(MAX) NULL,");
         }

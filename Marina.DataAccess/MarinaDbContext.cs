@@ -36,7 +36,7 @@ public partial class MarinaDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).HasMaxLength(100);
 
-            entity.HasData(new Line { Id = 1, Name = "Farshid" }, new Line { Id = 2, Name = "Ahmad" });
+            entity.HasData(new NSM { Id = 1, Name = "Farshid" }, new NSM { Id = 2, Name = "Ahmad" });
         });
 
         modelBuilder.Entity<NotImportedData>(entity =>
@@ -132,7 +132,7 @@ public partial class MarinaDbContext : DbContext
                 IsDeleted = false,
                 IsActive = true,
                 CreateDate = DateTime.Now,
-                NsmId = 1
+                NsmId = 1,
             });
 
         });
